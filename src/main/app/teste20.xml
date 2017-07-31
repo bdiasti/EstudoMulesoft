@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:servlet="http://www.mulesoft.org/schema/mule/servlet" xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:jdbc="http://www.mulesoft.org/schema/mule/jdbc" xmlns:imap="http://www.mulesoft.org/schema/mule/imap" xmlns:jms="http://www.mulesoft.org/schema/mule/jms"
+	xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting" xmlns:jersey="http://www.mulesoft.org/schema/mule/jersey" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:cxf="http://www.mulesoft.org/schema/mule/cxf" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.mulesoft.org/schema/mule/jms http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/cxf http://www.mulesoft.org/schema/mule/cxf/current/mule-cxf.xsd
+http://www.mulesoft.org/schema/mule/jersey http://www.mulesoft.org/schema/mule/jersey/current/mule-jersey.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/imap http://www.mulesoft.org/schema/mule/imap/current/mule-imap.xsd
+http://www.mulesoft.org/schema/mule/jdbc http://www.mulesoft.org/schema/mule/jdbc/current/mule-jdbc.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/servlet http://www.mulesoft.org/schema/mule/servlet/current/mule-servlet.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="8081" doc:name="HTTP Listener Configuration"/>
+    <http:listener-config name="HTTP_Listener_Configuration1" host="0.0.0.0" port="8085" doc:name="HTTP Listener Configuration"/>
+    <http:listener-config name="HTTP_Listener_Configuration2" host="0.0.0.0" port="8089" basePath="/" doc:name="HTTP Listener Configuration"/>
+    <http:listener-config name="HTTP_Listener_Configuration3" host="0.0.0.0" port="9090" doc:name="HTTP Listener Configuration"/>
+    <http:listener-config name="HTTP_Listener_Configuration4" host="0.0.0.0" port="4043"  doc:name="HTTP Listener Configuration"/>
+    <http:listener-config name="HTTP_Listener_Configuration5" host="0.0.0.0" port="9095" doc:name="HTTP Listener Configuration"/>
+    <http:listener-config name="HTTP_Listener_Configuration6" host="0.0.0.0" port="9096" doc:name="HTTP Listener Configuration"/>
+    <http:listener-config name="HTTP_Listener_Configuration7" host="0.0.0.0" port="9898" doc:name="HTTP Listener Configuration"/>
+    <db:generic-config name="Generic_Database_Configuration" url="teste" doc:name="Generic Database Configuration"/>
+    <http:listener-config name="HTTP_Listener_Configuration8" host="0.0.0.0" port="1010" doc:name="HTTP Listener Configuration"/>
+    <wildcard-filter pattern="/Hello*" caseSensitive="true" name="Wildcard" doc:name="Wildcard"/>
+    <flow name="teste20Flow6">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/teste" doc:name="HTTP"/>
+        <component class="teste20.Greeting" doc:name="Java"/>
+        <flow-ref name="teste20Flow" doc:name="teste20Flow"/>
+    </flow>
+    <flow name="teste20Flow">
+        <http:listener config-ref="HTTP_Listener_Configuration3" path="/" doc:name="HTTP"/>
+        <logger message="#[message:payload]" level="INFO" doc:name="Logger"/>
+        <echo-component doc:name="Echo"/>
+    </flow>
+    <flow name="ExemploCria&#231;&#227;oREST">
+    	<!--  Use path /* if use component REST in this flow  shared for win points-->
+        <http:listener config-ref="HTTP_Listener_Configuration4" path="/*" doc:name="HTTP"/>
+        <jersey:resources doc:name="REST">
+            <component class="teste20.HelloWorldResource"/>
+        </jersey:resources>
+    </flow>
+    <flow name="ExemploCria&#231;&#227;oWebService">
+        <http:listener config-ref="HTTP_Listener_Configuration5" path="/*" doc:name="HTTP"/>
+        <cxf:jaxws-service serviceClass="teste20.HelloWebService" doc:name="CXF"/>
+        <component class="teste20.HelloServiceImpl" doc:name="Java"/>
+    </flow>
+    <flow name="usandoGroovy">
+        <http:listener config-ref="HTTP_Listener_Configuration6" path="/" doc:name="HTTP"/>
+        <logger message="#[payload]" level="INFO" doc:name="Logger"/>
+        <scripting:component doc:name="Groovy">
+            <scripting:script engine="Groovy"><![CDATA[dirName = "C:/MyPicture"
+new File(dirName).eachFile() { file ->
+defnewName = (file.getName() =~ /.jpg/).replaceFirst("infocom.jpg")
+File f = new File(dirName + "/" + newName)
+file.renameTo(f)
+println file.getName() + " -> " + f.getName() }]]></scripting:script>
+        </scripting:component>
+    </flow>
+    <flow name="teste20Flow1">
+        <http:listener config-ref="HTTP_Listener_Configuration7" path="/" doc:name="HTTP"/>
+        <component class="teste20.Greeting" doc:name="Java"/>
+    </flow>
+    <flow name="teste20Flow4">
+        <db:select config-ref="Generic_Database_Configuration" doc:name="Database">
+            <db:dynamic-query><![CDATA[SELECT * FROM DUAL]]></db:dynamic-query>
+        </db:select>
+        <object-to-string-transformer doc:name="Object to String"/>
+        <file:outbound-endpoint path="C:\Users\bernardo.joaquim" responseTimeout="10000" doc:name="File"/>
+    </flow>
+    <flow name="teste20Flow2">
+        <file:inbound-endpoint path="C:\Users\bernardo.joaquim\Desktop\documentos\tickets\4014915\LOCAWEB_TESTES\LOCAWEB_TESTES\BOAS_VINDAS" responseTimeout="10000" doc:name="File"/>
+        <choice doc:name="Choice">
+            <when expression="">
+                <file:outbound-endpoint path="C:\Users\bernardo.joaquim\Pictures" responseTimeout="10000" doc:name="File"/>
+            </when>
+            <when expression="">
+                <file:outbound-endpoint path="C:\Users\Public\Pictures" responseTimeout="10000" doc:name="File"/>
+            </when>
+        </choice>
+    </flow>
+    <flow name="teste20Flow3">
+        <servlet:inbound-endpoint path="/servlet" responseTimeout="10000" doc:name="Servlet"/>
+        <collection-splitter doc:name="Collection Splitter"/>
+    </flow>
+    <flow name="teste20Flow5">
+        <http:listener config-ref="HTTP_Listener_Configuration8" path="/" doc:name="HTTP"/>
+        <filter ref="Wildcard" doc:name="Filter Reference"/>
+        <component class="teste20.Greeting" doc:name="Java"/>
+    </flow>
+    
+
+    
+</mule>
